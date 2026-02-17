@@ -66,5 +66,17 @@ The proposed method integrates feature engineering and correlation analysis to i
 * **Gradient Boosting** achieves the lowest MAE (743.21) for impressions but lower CV R², suggesting mild overfitting.
 * **Random Forest** underperforms across both tasks, indicating linear relationships dominate in this dataset.
 
+## Training Configuration
+
+The models were trained using the scikit-learn machine learning library with optimized hyperparameters.
+
+| **Parameter** | **Value / Description** |
+|----------------|--------------------------|
+| **Framework** | scikit-learn |
+| **Preprocessing** | StandardScaler for feature normalization |
+| **Train-Test Split** | 80-20 ratio |
+| **Cross-Validation** | 5-fold CV for robust evaluation |
+| **Random State** | 42 (for reproducibility) |
+
 
 

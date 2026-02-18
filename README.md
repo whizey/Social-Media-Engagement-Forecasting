@@ -1,89 +1,86 @@
-# Social-Media-Engagement-Forecasting
-ML-powered Instagram analytics predicting post performance before publishing. Analyzes engagement patterns to forecast reach and viral potential with 90%+ accuracy. Trained 5 models identifying follower growth and saves as key metrics more important than likes alone. Enables content optimization and strategy. Python, scikit-learn, NumPy
-## Overview
-This project focuses on predicting Instagram post reach and identifying viral content patterns using machine learning techniques. Reach prediction helps understand what drives engagement and enables data-driven content optimization for better audience connection and growth.
+# Social Media Engagement Forecasting
 
-Two approaches were explored and compared —
-**Linear Regression** as the baseline statistical model, and **PassiveAggressiveRegressor** as an online learning approach for enhanced prediction accuracy with evolving patterns.
+Predicting Instagram post impressions and viral potential using 
+machine learning. Trained 5 regression models and identified that 
+saves and follower growth matter more than likes for reach.
 
-The proposed method integrates feature engineering and correlation analysis to identify key engagement drivers and build interpretable models that provide actionable insights for content creators.
+**Best Model:** Ridge Regression — R² 0.9485, CV R² 0.8210
 
-## Objectives
-* Developing a machine learning-based prediction system for Instagram post reach.
+---
 
-* Identifying key features that contribute to viral content and high engagement.
+## The Problem
 
-* Comparing multiple regression algorithms quantitatively for optimal performance.
+Content creators have no way to know in advance which posts will 
+perform well. Likes and follower count alone don't explain why some 
+posts reach 10x more people than others, making content strategy 
+largely guesswork.
 
-* Evaluating performance using R² Score, Mean Absolute Error, and prediction accuracy metrics.
+**Goal:** Predict post impressions from engagement signals so 
+creators can make data-backed content decisions.
 
-* Providing actionable insights for content optimization and audience growth strategies.
-## Model Architecture
+---
 
-## Model Architecture
+## Assumptions
 
-### Linear Regression (Baseline)
-* Simple statistical model establishing linear relationships between features and reach.
-* Efficient for interpretability but limited in capturing complex non-linear engagement patterns.
-* Provides baseline performance metrics and feature importance insights.
+- Past engagement patterns are stable enough to predict future 
+  post performance on the same account
+- Saves and follower conversions are stronger signals of algorithmic 
+  amplification than passive reactions like likes
+- Viral Score is a derived metric (linear combination of features), 
+  not an independent target — confirmed by perfect R² = 1.000
 
-### Ridge Regression (Best Model)
-* Regularized linear model with L2 penalty achieving the highest R² of 0.9485 for impressions prediction.
-* Effectively handles multicollinearity between correlated engagement features.
-* Outperforms all models with the highest CV R² of 0.8210, confirming strong generalization on unseen data.
+---
 
-### Additional Models Evaluated
-* **Lasso Regression**: Regularized linear model with L1 penalty for automatic feature selection.
-* **Gradient Boosting Regressor**: Sequential ensemble technique — lower MAE but overfits with CV R² of only 0.6435.
-* **Random Forest Regressor**: Ensemble method capturing non-linear relationships and feature interactions.
+## Approach
 
-## Quantitative Results
+### 1. Feature Engineering
+Created three derived features to capture behavioral patterns raw 
+counts miss:
+- Engagement Rate
+- Save-to-Like Ratio  
+- Follower Conversion Rate
 
-### Impressions Prediction — Model Rankings
+### 2. Models Trained
+| Model | R² | CV R² | MAE |
+|-------|----|-------|-----|
+| **Ridge** ✅ | **0.9485** | **0.8210** | 936.78 |
+| Lasso | 0.9374 | 0.8057 | 1015.60 |
+| Linear Regression | 0.9360 | 0.8053 | 1026.58 |
+| Gradient Boosting | 0.9061 | 0.6435 | 743.21 |
+| Random Forest | 0.8670 | 0.6646 | 1062.64 |
 
-| **Rank** | **Model** | **R²** | **MAE** | **RMSE** | **CV R²** |
-|----------|-----------|--------|---------|----------|-----------|
-| 🥇 1 | **Ridge** | **0.9485** | **936.78** | **1414.19** | **0.8210** |
-| 🥈 2 | Lasso | 0.9374 | 1015.60 | 1559.64 | 0.8057 |
-| 🥉 3 | Linear Regression | 0.9360 | 1026.58 | 1577.19 | 0.8053 |
-| 4 | Gradient Boosting | 0.9061 | 743.21 | 1909.36 | 0.6435 |
-| 5 | Random Forest | 0.8670 | 1062.64 | 2272.85 | 0.6646 |
+### 3. Validation
+- 80/20 train-test split
+- 5-fold cross-validation for generalization check
+- StandardScaler for feature normalization
 
-### Viral Score Prediction — Model Rankings
+---
 
-| **Rank** | **Model** | **R²** | **MAE** | **RMSE** | **CV R²** |
-|----------|-----------|--------|---------|----------|-----------|
-| 🥇 1 | **Linear Regression** | **1.0000** | **1.28e-14** | **1.75e-14** | **1.0000** |
-| 🥈 2 | Ridge | 0.9999 | 5.58e-02 | 1.23e-01 | 0.9998 |
-| 🥉 3 | Lasso | 0.9805 | 1.26 | 2.08 | 0.9478 |
-| 4 | Gradient Boosting | 0.8297 | 2.90 | 6.15 | 0.8819 |
-| 5 | Random Forest | 0.7685 | 3.48 | 7.16 | 0.8707 |
+## Trade-offs
 
-### Key Observations
+**Why not Gradient Boosting?**  
+It had the lowest MAE (743.21) but its CV R² dropped to 0.6435 — 
+a sign of overfitting. Ridge generalized far better.
 
-* **Ridge Regression** is the best model for **Impressions Prediction** (R² = 0.9485, CV R² = 0.8210).
-* **Linear Regression** achieves a **perfect R² = 1.000** for Viral Score Prediction, indicating the viral score is a direct linear combination of input features.
-* **Gradient Boosting** achieves the lowest MAE (743.21) for impressions but lower CV R², suggesting mild overfitting.
-* **Random Forest** underperforms across both tasks, indicating linear relationships dominate in this dataset.
+**Why not Random Forest?**  
+Underperformed across both tasks. The data has mostly linear 
+relationships, so a complex ensemble wasn't needed.
 
-## Training Configuration
+**Feature engineering risk:**  
+Derived ratios improve accuracy but assume consistent engagement 
+behavior — may not generalize to accounts with very different 
+audience sizes.
 
-The models were trained using the scikit-learn machine learning library with optimized hyperparameters.
+---
 
-| **Parameter** | **Value / Description** |
-|----------------|--------------------------|
-| **Framework** | scikit-learn |
-| **Preprocessing** | StandardScaler for feature normalization |
-| **Train-Test Split** | 80-20 ratio |
-| **Cross-Validation** | 5-fold CV for robust evaluation |
-| **Random State** | 42 (for reproducibility) |
+## Key Finding
 
-## Visualization
+Saves and follower growth are stronger predictors of reach than 
+likes or comments. Instagram's algorithm appears to reward content 
+that earns bookmarks and attracts new followers — not just passive 
+reactions.
 
-### 1. Correlation Heatmap
-![Correlation Matrix](outputs/correlation_heatmap.png)
-
-*Displays correlation coefficients between all features, highlighting strong relationships between engagement metrics and reach.*
+---
 
 
 
